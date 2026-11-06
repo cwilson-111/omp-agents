@@ -9,16 +9,35 @@ specialists plus an orchestrator, written to be dispatched by name:
 
 ## Roster
 
+Thirteen agents, grouped by what they are for.
+
+**Direct and decide**
+
 | Agent | Edits? | Use it when |
 |---|---|---|
 | `chief-of-staff` | yes | The work spans several files or disciplines and needs decomposing, dispatching and integrating. It is the only agent that can spawn the others. |
 | `planner` | no | The goal is clear but the sequence is not. Returns ordered phases, each with a falsifiable acceptance criterion and a verification command. |
 | `architect` | no | Two or more designs are defensible, or a cross-cutting interface/schema is changing. Returns one decision plus the contract and the migration. |
+| `judge` | no | Two positions are both defensible and someone has to rule. Returns structured output with a confidence level and what would reverse it. |
+
+**Build**
+
+| Agent | Edits? | Use it when |
+|---|---|---|
 | `backend` | yes | Engines, parsing, storage, CLI, background workers, packaging, CI. |
 | `frontend` | yes | Tkinter windows, browser extensions, web pages, CLI output. Must verify by operating the real surface. |
+| `ml-engineer` | yes | LLM and retrieval code: prompts, embeddings, vector stores, chunking, transcription. Treats model output as untrusted and measures rather than asserts. |
+| `debugger` | yes | The symptom is known but the cause is not. Reproduces first, proves the cause by toggling it, then fixes. |
+| `test-engineer` | yes | A real risk has no test, or an existing test pins wording instead of behaviour. Proves a regression test by running it against the unfixed code. |
+
+**Check and ship**
+
+| Agent | Edits? | Use it when |
+|---|---|---|
 | `arguer` | no | Before anything expensive or irreversible. Adversarial; every objection carries file:line evidence and a severity. |
-| `judge` | no | Two positions are both defensible and someone has to rule. Returns structured output with a confidence level. |
 | `security-reviewer` | no | Privilege boundaries, filesystem redirection, destructive operations, supply chain, extension permissions. |
+| `docs-writer` | yes | Markdown has drifted from the code. The counterpart to `arguer`, which finds drift but cannot fix it. |
+| `release-manager` | yes | Shipping a version: bump everywhere, date the changelog, update packaging manifests, tag, watch CI, verify an artifact. |
 
 Unchanged and still available from OMP's bundled set: `scout`, `reviewer`,
 `task`, `sonic`.
