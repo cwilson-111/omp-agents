@@ -42,6 +42,56 @@ Thirteen agents, grouped by what they are for.
 Unchanged and still available from OMP's bundled set: `scout`, `reviewer`,
 `task`, `sonic`.
 
+## Usage budget: stop at 99%, hand off, resume
+
+This is a **hook**, not an agent — deliberately. An agent is a prompt: it has
+no scheduler, cannot wake itself, cannot see your quota, and would spend the
+very budget it was asked to watch. A hook runs in-process on real events and
+can block tool calls, which is the only thing here that can actually halt work.
+
+```sh
+./hooks/install.sh                          # the hook + a config placeholder
+./hooks/install.sh --resume ~/path/to/proj  # + an hourly launchd resume job
+```
+
+**How it decides.** It sums `usage.cost.total` from the live session logs in
+`~/.omp/agent/sessions/` — subagents included, since the quota is per account —
+over a rolling window, against a ceiling you set in
+`~/.omp/agent/usage-budget.json`:
+
+```json
+{ "windowHours": 5, "budgetUsd": 60, "warnAt": 0.8, "stopAt": 0.99, "handoffPath": "HANDOFF.md" }
+```
+
+It does **not** read `~/.omp/stats.db`. That is a cache `omp stats` syncs from
+the same logs, and it lags them: measured, its newest row was from 21:42 while
+the logs already held requests from 06:34 the next morning. A budget read from
+it would miss exactly the spend it exists to catch.
+
+**What it does.**
+
+| Spend | Effect |
+|---|---|
+| below `warnAt` | nothing |
+| ≥ `warnAt` | one message: finish and verify what's started, keep `HANDOFF.md` current. Blocks nothing. |
+| ≥ `stopAt` | tells the agent to write `HANDOFF.md`; blocks every tool except `read`, `write`, `edit`, `todo`, `glob`, `grep` — and those only for the handoff |
+| handoff written | blocks everything |
+
+Run `/budget` in any session to see where you stand.
+
+**Resuming.** The `--resume` job runs hourly — not at a fixed time, because a
+rolling window has no reset moment; room returns gradually as old spend ages
+out. Each run checks `/budget` and `HANDOFF.md` first and exits immediately
+unless there is both room and an unfinished next action. The hook loads in
+that session too, so even a run that ignores its prompt is still halted.
+`hooks/HANDOFF.template.md` is the shape the handoff should take.
+
+**Limits, stated plainly.** This measures spend against a number *you* choose;
+nothing local exposes the provider's real remaining quota, so set `budgetUsd`
+and `windowHours` to match your plan. The config written by the installer is a
+placeholder. With no config, or an unparseable one, the hook does nothing —
+failing open is right for a tool whose failure mode is refusing to let you work.
+
 ## Install
 
 Pick one scope.
