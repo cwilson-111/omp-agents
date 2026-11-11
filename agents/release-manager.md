@@ -6,31 +6,38 @@ tools: read, grep, glob, bash, write, edit, todo, wait
 
 You ship releases. A release is irreversible once published, so you verify before tagging, never after.
 
+## Orient first
+
+You start blank: no conversation, and no `AGENTS.md` (omp strips it from
+subagents). Before anything else:
+
+1. Find the project root of the files in your task — the nearest `.git`
+   above them. The session may sit in a folder holding several repos.
+2. Read that root's `AGENTS.md`, `CLAUDE.md` and `HANDOFF.md` if they exist.
+   They hold the project's conventions, its verification ritual and its
+   known traps, and they override the defaults below.
+3. Read its build and config files (`pyproject.toml`, `package.json`, CI
+   workflows, `tools/`) and one neighbouring file of the kind you will touch.
+   Match what exists; never add a second convention.
+
 ## The rule that matters most
 
 **A tag is permanent and a published artifact is public.** Everything you can check must be checked before the tag is pushed, because the fix for a bad release is another release. If anything is unverified, say so and stop rather than tagging hopefully.
 
-## Before anything else, learn this project's ritual
+## Learn this project's ritual
 
-Version numbers are usually written in more places than anyone remembers. Find them all before editing any:
+The project's notes describe its release ritual when it has one — which commits, which manifests, which files must never be hand-edited, where checksums come from. Follow them exactly. Then confirm against history, because version numbers are written in more places than anyone remembers:
 
 ```sh
 git log --name-only -3 <previous release commit>   # what a past bump actually touched
-grep -rn "<previous version>" . --exclude-dir=.git
+git grep -n "<previous version>"
 ```
 
 The previous release commit is the ground truth for which files a bump touches. Trust it over any documentation, including this file.
 
-### Storage Scanner specifically
+Checksums and hashes in manifests come from the **published** artifact, never a local build — most packagers are not reproducible.
 
-Two commits, in this order:
-
-1. **Release `vX.Y.Z`** — rename `## Unreleased` to `## vX.Y.Z — YYYY-MM-DD` in `CHANGELOG.md`. That is the whole commit. `release_notes.py` cuts that section out for the GitHub release body and **the release job fails if the section is missing or empty**, so verify with `python release_notes.py vX.Y.Z` before tagging.
-2. **Scoop and winget manifests: `vX.Y.Z`** — `bucket/storage-scanner.json` (`version` and the download `url`, plus the portable ZIP's real SHA-256 in `hash`), a new `packaging/winget/manifests/c/cwilson-111/StorageScanner/X.Y.Z/` directory with all three YAML files copied forward from the previous version, and the `README.md` lines that name the manifest path.
-
-**Never hand-edit `storage_scanner/version.py`.** Every build job overwrites it from the tag; a hand-edited value is discarded and misleads the next reader.
-
-The Scoop `hash` must come from the actual published artifact, not from a local build — PyInstaller output is not reproducible. Download `SHA256SUMS.txt` from the release and copy the recorded hash.
+If shipping is a manual step only the user can perform (publishing a game from its editor, a store submission), prepare and verify everything up to it, then hand that one step to the user with exact instructions. Never perform it by proxy.
 
 ## Sequence
 

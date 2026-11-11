@@ -1,11 +1,40 @@
 # omp-agents
 
-Task agents for [Oh My Pi](https://github.com/badlogic/pi-mono) (`omp`). Eight
-specialists plus an orchestrator, written to be dispatched by name:
+Task agents for [Oh My Pi](https://github.com/badlogic/pi-mono) (`omp`): twelve
+specialists plus an orchestrator, written to be dispatched by name, and a
+dispatch guide that tells the main session when to use which.
 
 ```json
 { "agent": "planner", "task": "..." }
 ```
+
+## How they work on any project
+
+The agents carry discipline, not project facts. Each one starts with the
+same **Orient first** step: find the project root of the files in its task
+(the nearest `.git`), read that root's `AGENTS.md`, `CLAUDE.md` and
+`HANDOFF.md`, then its build files, and follow them over its own defaults.
+
+That step exists because omp gives subagents **no `AGENTS.md`** (it strips
+every file of that name from their context) and sessions often start in a
+folder holding several repos, so nothing project-specific arrives on its
+own. Put each project's conventions, verification ritual and traps in its
+own `AGENTS.md`: a main session started there loads it automatically, and
+every agent reads it explicitly.
+
+MCP tools are inherited whatever an agent's `tools:` list says, so an agent
+working on a game can drive the engine's MCP server (e.g. Roblox Studio)
+to play-test its change.
+
+## Dispatch guide
+
+`dispatch/AGENTS.md` is standing guidance for **main** sessions: when to do
+work directly versus delegate, which agent each trigger calls for, what
+every dispatch must carry (the project root, the acceptance criterion,
+user-only steps resolved), and the rule that one child at a time drives a
+shared singleton such as an open Studio place or a dev server. Install it
+as the user-level `~/.omp/agent/AGENTS.md` (below); subagents never see it,
+which is right, since dispatching is the parent's job.
 
 ## Roster
 
@@ -24,8 +53,8 @@ Thirteen agents, grouped by what they are for.
 
 | Agent | Edits? | Use it when |
 |---|---|---|
-| `backend` | yes | Engines, parsing, storage, CLI, background workers, packaging, CI. |
-| `frontend` | yes | Tkinter windows, browser extensions, web pages, CLI output. Must verify by operating the real surface. |
+| `backend` | yes | Engines, parsing, storage and saves, server/game logic, CLI, background workers, packaging, CI. |
+| `frontend` | yes | App windows, web pages, browser extensions, game UI, CLI output. Must verify by operating the real surface. |
 | `ml-engineer` | yes | LLM and retrieval code: prompts, embeddings, vector stores, chunking, transcription. Treats model output as untrusted and measures rather than asserts. |
 | `debugger` | yes | The symptom is known but the cause is not. Reproduces first, proves the cause by toggling it, then fixes. |
 | `test-engineer` | yes | A real risk has no test, or an existing test pins wording instead of behaviour. Proves a regression test by running it against the unfixed code. |
@@ -35,7 +64,7 @@ Thirteen agents, grouped by what they are for.
 | Agent | Edits? | Use it when |
 |---|---|---|
 | `arguer` | no | Before anything expensive or irreversible. Adversarial; every objection carries file:line evidence and a severity. |
-| `security-reviewer` | no | Privilege boundaries, filesystem redirection, destructive operations, supply chain, extension permissions. |
+| `security-reviewer` | no | Privilege boundaries, untrusted parsers, client/server trust, filesystem redirection, destructive operations, secrets, supply chain, extension permissions. |
 | `docs-writer` | yes | Markdown has drifted from the code. The counterpart to `arguer`, which finds drift but cannot fix it. |
 | `release-manager` | yes | Shipping a version: bump everywhere, date the changelog, update packaging manifests, tag, watch CI, verify an artifact. |
 
@@ -96,13 +125,17 @@ failing open is right for a tool whose failure mode is refusing to let you work.
 
 Pick one scope.
 
-**User scope** — available in every project on the machine:
+**User scope** — available in every project on the machine. Symlinks track
+the repo, so `git pull` updates both:
 
 ```sh
 git clone https://github.com/cwilson-111/omp-agents.git
-mkdir -p ~/.omp/agent/agents
-cp omp-agents/agents/*.md ~/.omp/agent/agents/
+ln -s "$PWD/omp-agents/agents" ~/.omp/agent/agents
+ln -s "$PWD/omp-agents/dispatch/AGENTS.md" ~/.omp/agent/AGENTS.md
 ```
+
+If `~/.omp/agent/AGENTS.md` already exists, append the dispatch guide to it
+instead of replacing it.
 
 Windows PowerShell:
 
@@ -146,9 +179,12 @@ A name that did not load fails preflight with `Unknown agent "..."`.
 - Read-only agents declare only `read, grep, glob, web_search` (plus `bash` for
   `security-reviewer`). They cannot edit even when asked to.
 - Only `chief-of-staff` declares `spawns`. The rest cannot start subagents.
-- `security-reviewer` and `frontend` name concrete subsystems from the author's
-  own projects as worked examples. Adjust those paragraphs for your codebase —
-  the discipline in the rest of each prompt is general.
+- No agent names a project. Project facts live in each project's `AGENTS.md`
+  (this author's: `Storage-Scanner/`, `gmail-summarizer-extension/`,
+  `roblox-game/`), which the agents read during **Orient first**.
+- `frontend`, `backend`, `debugger`, `test-engineer` and `ml-engineer` declare
+  `eval`: browser automation (`browser`) is a prelude inside `eval`, not a
+  tool of its own.
 
 ## Adding an agent
 
