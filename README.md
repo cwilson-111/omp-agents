@@ -187,10 +187,10 @@ A name that did not load fails preflight with `Unknown agent "..."`.
     agentModelOverrides: { scout: "@smol", sonic: "@smol" }
   ```
 
-  Without a `build` role, `@build` matches nothing and those agents fall back
-  to the parent's model. An unset `smol` inherits `default`, so background
-  work runs on the main model until it is set. Several agents set
-  `thinking-level: high`; models with no controllable effort ignore it.
+  Define the `build` role before using the build agents. An unset `smol`
+  inherits `default` (omp's model docs), so background work runs on the main
+  model until it is set. Several agents set `thinking-level: high`; models
+  with no controllable effort ignore it.
 - Read-only agents declare only `read, grep, glob, web_search` (plus `bash` for
   `security-reviewer`). They cannot edit even when asked to.
 - Only `chief-of-staff` declares `spawns`. The rest cannot start subagents.
