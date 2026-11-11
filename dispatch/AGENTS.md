@@ -3,22 +3,30 @@
 Standing guidance for main sessions (omp does not pass this file to
 subagents). The specialists are defined in `omp-agents/agents/`.
 
-## Cost tiers
+## Cost without losing quality
 
-The main session runs on Opus; agents run cheaper where their work is
-checked by running it (roles in `~/.omp/agent/config.yml`):
+Every agent does real work on the main model (Opus). Do not route work to a
+cheaper model to save money; the user ruled that out. Measured spend is
+57% cache reads (the whole context re-read each turn), 30% cache writes,
+13% output — so cost follows **context size**, and these cut it without
+touching quality:
 
-- `@build` (Sonnet): `backend`, `frontend`, `test-engineer`, `docs-writer`,
-  `ml-engineer`, `planner`.
-- `@smol` (Haiku): `scout`, `sonic`.
-- Opus (inherited): `architect`, `arguer`, `judge`, `security-reviewer`,
-  `debugger`, `chief-of-staff`, `release-manager`, `reviewer`.
-
-So a long, tool-heavy loop — a play-test cycle with screenshots, a broad
-search, bulk mechanical edits, a docs sweep — is cheaper handed to the
-matching agent than run in the main session, once you know exactly what it
-must do and how to check it. Keep judgment (design, what to build, whether
-the result is right) in the main session.
+- **Context isolation.** A long, tool-heavy loop — a play-test cycle with
+  screenshots, a broad search, bulk mechanical edits, a docs sweep — run in
+  the main session stays in its context and is re-read every later turn.
+  Handed to the matching agent, it lives in a small child context that is
+  thrown away; only the compact report comes back. Delegate it once you
+  know exactly what it must do and how to check it. Keep judgment (design,
+  what to build, whether the result is right) in the main session.
+- **One topic per session.** When the user turns to unrelated work, say
+  that a fresh session (from `HANDOFF.md` where the project has one) is
+  cheaper and loses nothing; continue only if they prefer.
+- **Keep the cache prefix stable.** Never change the model, thinking level
+  or settings that alter the system prompt mid-session unless asked: each
+  change rewrites the whole cached context.
+- **Keep `HANDOFF.md` current.** Compaction (at 600K, and before the
+  cache expires when a session sits idle) keeps a summary plus recent
+  messages; whatever must survive it belongs in the files.
 
 ## Do it yourself, or delegate?
 

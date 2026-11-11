@@ -171,26 +171,30 @@ A name that did not load fails preflight with `Unknown agent "..."`.
   Discovery is first-wins by exact name, and project scope beats user scope
   beats bundled. Delete `security-reviewer.md` to fall back to the bundled one,
   or rename it (change the `name:` field too) to keep both.
-- **Cost tiers.** The build agents (`backend`, `frontend`, `test-engineer`,
+- **Models.** The build agents (`backend`, `frontend`, `test-engineer`,
   `docs-writer`, `ml-engineer`, `planner`) declare `model: "@build"`; the
-  judgment agents (`architect`, `arguer`, `judge`, `security-reviewer`,
-  `debugger`, `chief-of-staff`, `release-manager`) pin nothing and inherit
-  the parent's model. Map the roles in `~/.omp/agent/config.yml`, and send
-  the bundled `scout`/`sonic` to the cheap tier with an override:
+  judgment agents pin nothing and inherit the parent's model. Define the
+  `build` role in `~/.omp/agent/config.yml` — set to the main model here, so
+  quality is unchanged, and switching that tier to a cheaper model later is
+  one line:
 
   ```yaml
   modelRoles:
     default: anthropic/claude-opus-5-5:high
-    build: anthropic/claude-sonnet-5-5:high   # half Opus's price
-    smol: anthropic/claude-haiku-5-5          # ~1/40; also titles, memory
-  task:
-    agentModelOverrides: { scout: "@smol", sonic: "@smol" }
+    build: anthropic/claude-opus-5-5:high
+    tiny: anthropic/claude-haiku-5-5   # session titles only
+  compaction:
+    thresholdTokens: 600000   # compact at 600K instead of ~850K on 1M windows
+    idleEnabled: true         # compact an idle session before its cache expires
   ```
 
-  Define the `build` role before using the build agents. An unset `smol`
-  inherits `default` (omp's model docs), so background work runs on the main
-  model until it is set. Several agents set `thinking-level: high`; models
-  with no controllable effort ignore it.
+  Why context, not models: measured over this author's sessions, 57% of
+  spend was cache reads and 30% cache writes, against 13% output. The cache
+  hit rate was already 98.5% with 1-hour entries (subscription login), so
+  cost tracks how much context is carried; the dispatch guide's *Cost
+  without losing quality* section covers the habits that shrink it.
+  Several agents set `thinking-level: high`; models with no controllable
+  effort ignore it.
 - Read-only agents declare only `read, grep, glob, web_search` (plus `bash` for
   `security-reviewer`). They cannot edit even when asked to.
 - Only `chief-of-staff` declares `spawns`. The rest cannot start subagents.
