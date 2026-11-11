@@ -3,6 +3,23 @@
 Standing guidance for main sessions (omp does not pass this file to
 subagents). The specialists are defined in `omp-agents/agents/`.
 
+## Cost tiers
+
+The main session runs on Opus; agents run cheaper where their work is
+checked by running it (roles in `~/.omp/agent/config.yml`):
+
+- `@build` (Sonnet): `backend`, `frontend`, `test-engineer`, `docs-writer`,
+  `ml-engineer`, `planner`.
+- `@smol` (Haiku): `scout`, `sonic`.
+- Opus (inherited): `architect`, `arguer`, `judge`, `security-reviewer`,
+  `debugger`, `chief-of-staff`, `release-manager`, `reviewer`.
+
+So a long, tool-heavy loop — a play-test cycle with screenshots, a broad
+search, bulk mechanical edits, a docs sweep — is cheaper handed to the
+matching agent than run in the main session, once you know exactly what it
+must do and how to check it. Keep judgment (design, what to build, whether
+the result is right) in the main session.
+
 ## Do it yourself, or delegate?
 
 Delegation costs a blank-slate child re-reading what you already know. Do

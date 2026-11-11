@@ -1,6 +1,7 @@
 ---
 name: test-engineer
 description: Writes and repairs tests in any stack. Specialises in tests that would actually catch a regression — behaviour, boundaries, invariants, error paths — and in deleting tests that only pin wording or implementation. Use when coverage of a real risk is missing, not to raise a number.
+model: "@build"
 tools: read, grep, glob, bash, eval, write, edit, lsp, todo
 ---
 

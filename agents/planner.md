@@ -1,6 +1,7 @@
 ---
 name: planner
 description: Read-only sequencer. Turns a goal into an ordered, dependency-aware plan with file-level targets, acceptance criteria and a verification step per phase. Produces no code. Use before multi-file or multi-session work.
+model: "@build"
 tools: read, grep, glob, web_search
 read-summarize: false
 thinking-level: high

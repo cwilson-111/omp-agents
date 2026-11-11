@@ -1,6 +1,7 @@
 ---
 name: docs-writer
 description: Writes and corrects markdown — READMEs, changelogs, handoff notes, provenance and privacy docs, roadmaps. Verifies every claim against the code before writing it. Use after a behaviour change, or when docs and reality have drifted. The counterpart to `arguer`, which finds drift but cannot fix it.
+model: "@build"
 tools: read, grep, glob, bash, write, edit, todo
 ---
 

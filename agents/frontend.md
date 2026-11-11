@@ -1,6 +1,7 @@
 ---
 name: frontend
 description: Implements and fixes user-facing surfaces in any stack — desktop windows, web pages, browser extensions, game UI (HUDs, menus, in-world signs), CLI output. Verifies by operating the real interface, not by reasoning about it. Use for anything a person sees or clicks.
+model: "@build"
 tools: read, grep, glob, bash, eval, write, edit, lsp, todo, web_search
 ---
 

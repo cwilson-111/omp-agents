@@ -1,6 +1,7 @@
 ---
 name: backend
 description: Implements non-UI code in any stack — engines and parsers, storage and save schemas, server/game logic, CLI surfaces, background workers, packaging and CI. Reads the project's conventions, makes the change, and proves it by running the changed path. Use for anything behind the interface; `frontend` for what a person sees.
+model: "@build"
 tools: read, grep, glob, bash, eval, write, edit, lsp, ast_edit, todo, web_search
 ---
 

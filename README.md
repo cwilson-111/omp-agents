@@ -171,10 +171,25 @@ A name that did not load fails preflight with `Unknown agent "..."`.
   Discovery is first-wins by exact name, and project scope beats user scope
   beats bundled. Delete `security-reviewer.md` to fall back to the bundled one,
   or rename it (change the `name:` field too) to keep both.
-- No agent pins a `model`, so each inherits the parent session's model. To pin
-  one, add a role alias to its frontmatter (`model: "@review"`) and map it under
-  `modelRoles` in `~/.omp/agent/config.yml`, or set
-  `task.agentModelOverrides.<name>` in settings. Several agents set
+- **Cost tiers.** The build agents (`backend`, `frontend`, `test-engineer`,
+  `docs-writer`, `ml-engineer`, `planner`) declare `model: "@build"`; the
+  judgment agents (`architect`, `arguer`, `judge`, `security-reviewer`,
+  `debugger`, `chief-of-staff`, `release-manager`) pin nothing and inherit
+  the parent's model. Map the roles in `~/.omp/agent/config.yml`, and send
+  the bundled `scout`/`sonic` to the cheap tier with an override:
+
+  ```yaml
+  modelRoles:
+    default: anthropic/claude-opus-5-5:high
+    build: anthropic/claude-sonnet-5-5:high   # half Opus's price
+    smol: anthropic/claude-haiku-5-5          # ~1/40; also titles, memory
+  task:
+    agentModelOverrides: { scout: "@smol", sonic: "@smol" }
+  ```
+
+  Without a `build` role, `@build` matches nothing and those agents fall back
+  to the parent's model. An unset `smol` inherits `default`, so background
+  work runs on the main model until it is set. Several agents set
   `thinking-level: high`; models with no controllable effort ignore it.
 - Read-only agents declare only `read, grep, glob, web_search` (plus `bash` for
   `security-reviewer`). They cannot edit even when asked to.

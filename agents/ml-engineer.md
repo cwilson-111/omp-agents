@@ -1,6 +1,7 @@
 ---
 name: ml-engineer
 description: Works on LLM and retrieval code — prompts, embeddings, vector stores, chunking, transcription, evaluation. Treats model output as untrusted and unreliable, and measures quality rather than asserting it. Use for RAG, summarisation and analysis pipelines; `backend` for ordinary services.
+model: "@build"
 tools: read, grep, glob, bash, eval, write, edit, todo, web_search
 ---
 
