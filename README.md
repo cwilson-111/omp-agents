@@ -79,7 +79,7 @@ very budget it was asked to watch. A hook runs in-process on real events and
 can block tool calls, which is the only thing here that can actually halt work.
 
 ```sh
-./hooks/install.sh                          # the hook + a config placeholder
+./hooks/install.sh                          # both hooks + a budget config placeholder
 ./hooks/install.sh --resume ~/path/to/proj  # + an hourly launchd resume job
 ```
 
@@ -120,6 +120,26 @@ nothing local exposes the provider's real remaining quota, so set `budgetUsd`
 and `windowHours` to match your plan. The config written by the installer is a
 placeholder. With no config, or an unparseable one, the hook does nothing —
 failing open is right for a tool whose failure mode is refusing to let you work.
+
+## Voice briefings: hear what you need, not the whole reply
+
+`hooks/pre/voice-brief.ts`, installed by the same `install.sh`. omp's built-in
+`speech.enabled` reads every reply aloud verbatim, paths, code and tables
+included. This hook replaces it: when the main session's reply is final, it
+asks the session's model, in a side turn kept out of history, for the one to
+three sentences you need (the outcome, anything you must do or decide, a risk
+that changes that) and plays them in the `speech.voice` Kokoro voice.
+
+- Keep `speech.enabled` false, or both talk.
+- `/voice on` / `/voice off` toggles it (`~/.omp/agent/voice-brief.json`; absent means on).
+- Speech stops the moment you send anything new.
+- Main interactive session only; subagents and `omp -p` runs stay silent.
+- Cost: one short side turn per finished reply. It reuses the session's prompt
+  cache, so it is mostly cache reads.
+
+Why the session model and not local Ollama: on a real reply, `llama3.2` kept
+the shell command and padded with "No problem."; `llama3` returned nothing.
+The side turn also sees the conversation, so it knows what you already know.
 
 ## Install
 

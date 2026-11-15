@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Install the usage-budget hook and, optionally, the resume job.
+# Install the usage-budget and voice-brief hooks and, optionally, the resume job.
 #
-#   ./hooks/install.sh                      # hook only
+#   ./hooks/install.sh                      # hooks only
 #   ./hooks/install.sh --resume <project>   # hook + a launchd job that
 #                                           # resumes <project> from HANDOFF.md
 #
-# The hook is symlinked, not copied, so `git pull` updates it in place.
+# The hooks are symlinked, not copied, so `git pull` updates them in place.
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,6 +16,8 @@ CONFIG="$AGENT_DIR/usage-budget.json"
 mkdir -p "$HOOK_DIR"
 ln -sfn "$HERE/pre/usage-budget.ts" "$HOOK_DIR/usage-budget.ts"
 echo "hook      -> $HOOK_DIR/usage-budget.ts"
+ln -sfn "$HERE/pre/voice-brief.ts" "$HOOK_DIR/voice-brief.ts"
+echo "hook      -> $HOOK_DIR/voice-brief.ts (set speech.enabled false, or both will talk)"
 
 # Never overwrite a budget the user has already tuned.
 if [ -f "$CONFIG" ]; then
