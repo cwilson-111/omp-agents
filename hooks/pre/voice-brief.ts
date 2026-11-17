@@ -26,9 +26,12 @@
  * voice. Needs ffmpeg's `ffplay` on PATH; without it the plain
  * voice plays and a warning says why. `/voice plain` goes back.
  *
+ * SPEED  `"speed": 1.25` plays briefings faster (pitch kept, ffmpeg
+ * `atempo`, 0.5–2); needs ffplay too. `omp say` itself has no speed flag.
+ *
  * CONFIG  ~/.omp/agent/voice-brief.json
- *   { "enabled": true, "effect": "ultron", "voice": "am_fenrir" }
- * Every field optional; absent file = on, plain, `speech.voice`.
+ *   { "enabled": true, "voice": "bm_george", "speed": 1.25, "effect": "ultron" }
+ * Every field optional; absent file = on, plain, normal speed, `speech.voice`.
  * /voice on | off | ultron | plain.
  */
 
@@ -73,7 +76,7 @@ const EFFECTS: Record<string, { filter: string; voice: string }> = {
 	},
 };
 
-type Config = { enabled?: boolean; effect?: string; voice?: string };
+type Config = { enabled?: boolean; effect?: string; voice?: string; speed?: number };
 
 function readConfig(): Config {
 	if (!existsSync(CONFIG)) return {};
@@ -136,15 +139,17 @@ export default function voiceBrief(pi: ExtensionAPI): void {
 	const speak = async (text: string, mine: number, warn: (message: string) => void) => {
 		const config = readConfig();
 		const effect = config.effect ? EFFECTS[config.effect] : undefined;
+		const speed = typeof config.speed === "number" && config.speed !== 1 ? Math.min(Math.max(config.speed, 0.5), 2) : undefined;
+		const filter = [effect?.filter, speed && `atempo=${speed}`].filter(Boolean).join(",");
 		const voice = config.voice ?? effect?.voice ?? String(lookup("speech.voice")?.get(pi.pi.settings) ?? "af_heart");
-		if (effect && hasFfplay()) {
+		if (filter && hasFfplay()) {
 			const wav = join(tmpdir(), `omp-voice-brief-${process.pid}.wav`);
 			if ((await run(process.execPath, ["say", "--voice", voice, "--out", wav, text])) !== 0) return;
 			if (mine !== generation) return;
-			await run("ffplay", ["-nodisp", "-autoexit", "-loglevel", "error", "-af", effect.filter, wav]);
+			await run("ffplay", ["-nodisp", "-autoexit", "-loglevel", "error", "-af", filter, wav]);
 			return;
 		}
-		if (effect) warn(`Voice effect "${config.effect}" needs ffplay (ffmpeg) on PATH; playing the plain voice.`);
+		if (filter) warn("Voice effects and speed need ffplay (ffmpeg) on PATH; playing the plain voice.");
 		await run(process.execPath, ["say", "--voice", voice, text]);
 	};
 
