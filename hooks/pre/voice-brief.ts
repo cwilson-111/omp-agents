@@ -32,7 +32,7 @@
  * CONFIG  ~/.omp/agent/voice-brief.json
  *   { "enabled": true, "voice": "bm_george", "speed": 1.25, "effect": "ultron" }
  * Every field optional; absent file = on, plain, normal speed, `speech.voice`.
- * /voice on | off | ultron | plain.
+ * /voice on | off | ultron | jarvis | plain. `jarvis`: George, crisp, faint synthetic sheen.
  */
 
 import { type ChildProcess, spawn, spawnSync } from "node:child_process";
@@ -71,6 +71,19 @@ const EFFECTS: Record<string, { filter: string; voice: string }> = {
 			"lowshelf=g=8:f=110",
 			"highshelf=g=-3:f=6000",
 			"volume=1.8",
+			"alimiter=limit=0.95",
+		].join(","),
+	},
+	jarvis: {
+		voice: "bm_george",
+		filter: [
+			// Crisp rather than deep: trim the boom, lift diction.
+			"highpass=f=90",
+			"equalizer=f=3000:t=q:w=1.2:g=3",
+			// A faint doubled, synthetic sheen and a small polished room.
+			"chorus=0.7:0.9:20:0.25:0.3:2",
+			"aecho=0.8:0.35:35|60:0.12|0.07",
+			"volume=1.4",
 			"alimiter=limit=0.95",
 		].join(","),
 	},

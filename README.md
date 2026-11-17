@@ -135,7 +135,9 @@ that changes that) and plays them in the `speech.voice` Kokoro voice.
 - `/voice ultron` switches to a deep, faintly metallic voice: Kokoro's
   `am_fenrir`, pitched down about 7 semitones, with a light flange and echo,
   played through ffmpeg's `ffplay` (must be on PATH; without it the plain voice
-  plays and a warning says why). `/voice plain` switches back.
+  plays and a warning says why). `/voice jarvis` is Kokoro's British
+  `bm_george`, crisp, with a faint chorus and small-room echo. `/voice plain`
+  switches back. `"speed": 1.25` in the config plays briefings faster.
 - Works with omp 18.3: the hook no longer passes `--speed`, which `omp say`
   rejects (that error had silenced every briefing).
 - Speech stops the moment you send anything new.
