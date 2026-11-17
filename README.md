@@ -132,6 +132,12 @@ that changes that) and plays them in the `speech.voice` Kokoro voice.
 
 - Keep `speech.enabled` false, or both talk.
 - `/voice on` / `/voice off` toggles it (`~/.omp/agent/voice-brief.json`; absent means on).
+- `/voice ultron` switches to a deep, faintly metallic voice: Kokoro's
+  `am_fenrir`, pitched down about 7 semitones, with a light flange and echo,
+  played through ffmpeg's `ffplay` (must be on PATH; without it the plain voice
+  plays and a warning says why). `/voice plain` switches back.
+- Works with omp 18.3: the hook no longer passes `--speed`, which `omp say`
+  rejects (that error had silenced every briefing).
 - Speech stops the moment you send anything new.
 - Main interactive session only; subagents and `omp -p` runs stay silent.
 - Cost: one short side turn per finished reply. It reuses the session's prompt
