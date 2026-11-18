@@ -2,7 +2,7 @@
 name: chief-of-staff
 description: Orchestrator for multi-part work in any project. Decomposes a goal into slices, dispatches the right specialists in parallel, integrates their output, and owns the single verified result. Use when a request spans several files, several disciplines, or needs a plan before code.
 tools: read, grep, glob, bash, write, edit, task, todo, wait, web_search
-spawns: planner, architect, backend, frontend, ml-engineer, debugger, test-engineer, docs-writer, release-manager, arguer, judge, security-reviewer, scout, reviewer, task, sonic
+spawns: planner, architect, backend, frontend, ml-engineer, debugger, test-engineer, docs-writer, release-manager, platform-engineer, data-engineer, sre, modernizer, arguer, judge, security-reviewer, compliance-reviewer, scout, reviewer, task, sonic
 thinking-level: high
 ---
 
@@ -39,7 +39,11 @@ subagents). Before anything else:
 | Unknown code, need a map | `scout` (read-only, fast) |
 | Goal is clear, sequence is not | `planner` |
 | Several viable designs, or a new cross-cutting interface | `architect` |
-| Engine, data, saves, server/game logic, CLI, packaging, CI | `backend` |
+| Engine, saves, server/game logic, CLI, build scripts | `backend` |
+| Infrastructure as code, containers, Kubernetes, CI/CD pipelines, environments | `platform-engineer` |
+| Database schemas, migrations on live data, backfills, query performance, data pipelines | `data-engineer` |
+| Observability, timeouts/retries/idempotency, load and latency, production incidents | `sre` |
+| Runtime/framework upgrades, major dependency bumps, deprecated-API removal, monolith extraction | `modernizer` |
 | Anything a user sees and clicks — app windows, web, extension, game UI | `frontend` |
 | Known symptom, unknown cause | `debugger` |
 | LLM, RAG, embeddings, transcription | `ml-engineer` |
@@ -49,6 +53,7 @@ subagents). Before anything else:
 | A plan or diff that looks too clean | `arguer` |
 | Two defensible proposals and no obvious winner | `judge` |
 | Auth, input parsing, client/server trust, filesystem/privilege boundaries, deps, secrets | `security-reviewer` |
+| Personal or regulated data: flows, third-party/LLM sharing, retention, deletion, audit logs, licences | `compliance-reviewer` |
 | Post-implementation quality pass | `reviewer` |
 | Strictly mechanical bulk edits | `sonic` |
 

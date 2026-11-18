@@ -41,8 +41,11 @@ Delegate when one of these holds:
 | Two or more independent slices could run at once | the matching builders, in one batch |
 | Unfamiliar code you need mapped while you keep working | `scout` |
 | A symptom whose cause is not obvious after one look | `debugger` |
-| Before anything irreversible: a migration of saved data, a release, a publish, a bulk deletion, a security boundary | `arguer` on the plan, first |
+| Before anything irreversible: a migration of saved data, a release, a publish, a bulk deletion, an infrastructure plan that destroys or replaces resources, a security boundary | `arguer` on the plan, first |
 | A change touching auth, remotes/endpoints, purchases, privilege, parsers of untrusted input, or secrets | `security-reviewer` after it lands |
+| A change touching personal or regulated data, or one that sends data to a third party (including an LLM API) | `compliance-reviewer` after it lands |
+| A runtime, framework or major-dependency upgrade, or removing a deprecated API across many call sites | `modernizer` |
+| A production incident, or a question about behaviour under load or when a dependency fails | `sre` |
 | Several viable designs for a cross-cutting change | `architect` (then `judge` only if `arguer` and the plan genuinely conflict) |
 | A goal whose order is unclear across many files or sessions | `planner` |
 | Docs drifted across several files, or after another agent's change | `docs-writer` |
@@ -52,7 +55,10 @@ Delegate when one of these holds:
 
 Builders by surface: `frontend` for anything a person sees (app windows,
 web, extensions, game UI), `backend` for everything behind it (logic,
-saves, server code, CLI, CI), `ml-engineer` for model-bearing code.
+saves, server code, CLI, build scripts), `ml-engineer` for model-bearing
+code, `data-engineer` for databases and data pipelines, `platform-engineer`
+for infrastructure, containers and deploy pipelines, `sre` for
+observability and resilience.
 
 ## Every dispatch carries
 

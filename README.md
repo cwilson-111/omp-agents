@@ -1,8 +1,11 @@
 # omp-agents
 
-Task agents for [Oh My Pi](https://github.com/badlogic/pi-mono) (`omp`): twelve
+Task agents for [Oh My Pi](https://github.com/badlogic/pi-mono) (`omp`): seventeen
 specialists plus an orchestrator, written to be dispatched by name, and a
-dispatch guide that tells the main session when to use which.
+dispatch guide that tells the main session when to use which. The core set
+covers personal projects end to end; the **Run and govern** group adds what
+enterprise work needs on top: infrastructure, databases, reliability,
+compliance and legacy migration.
 
 ```json
 { "agent": "planner", "task": "..." }
@@ -38,7 +41,7 @@ which is right, since dispatching is the parent's job.
 
 ## Roster
 
-Thirteen agents, grouped by what they are for.
+Eighteen agents, grouped by what they are for.
 
 **Direct and decide**
 
@@ -67,6 +70,16 @@ Thirteen agents, grouped by what they are for.
 | `security-reviewer` | no | Privilege boundaries, untrusted parsers, client/server trust, filesystem redirection, destructive operations, secrets, supply chain, extension permissions. |
 | `docs-writer` | yes | Markdown has drifted from the code. The counterpart to `arguer`, which finds drift but cannot fix it. |
 | `release-manager` | yes | Shipping a version: bump everywhere, date the changelog, update packaging manifests, tag, watch CI, verify an artifact. |
+
+**Run and govern**
+
+| Agent | Edits? | Use it when |
+|---|---|---|
+| `platform-engineer` | yes | Infrastructure as code, container images, Kubernetes/Helm, CI/CD pipelines, environments and secret wiring. Proves changes with validate/plan/build output; never applies to a shared environment. |
+| `data-engineer` | yes | Schemas, migrations on live data (expand/contract, online DDL), batched backfills, query and index performance, data pipelines. Proves every migration up/down/up on a scratch database. |
+| `sre` | yes | Observability, timeouts/retries/idempotency, health and shutdown, load and latency, incident triage. Proves behaviour by running the service and injecting the failure. |
+| `modernizer` | yes | Runtime and framework upgrades, major dependency bumps, deprecated-API removal, monolith extraction. Pins behaviour with characterisation tests first, then moves in small green steps. |
+| `compliance-reviewer` | no | Personal or regulated data: where it flows, which third parties (including LLM APIs) receive it, retention and deletion, access control, audit logging, dependency licences. Maps gaps to the framework the project names; not legal advice. |
 
 Unchanged and still available from OMP's bundled set: `scout`, `reviewer`,
 `task`, `sonic`.
@@ -200,7 +213,8 @@ A name that did not load fails preflight with `Unknown agent "..."`.
   beats bundled. Delete `security-reviewer.md` to fall back to the bundled one,
   or rename it (change the `name:` field too) to keep both.
 - **Models.** The build agents (`backend`, `frontend`, `test-engineer`,
-  `docs-writer`, `ml-engineer`, `planner`) declare `model: "@build"`; the
+  `docs-writer`, `ml-engineer`, `planner`, `platform-engineer`,
+  `data-engineer`, `sre`, `modernizer`) declare `model: "@build"`; the
   judgment agents pin nothing and inherit the parent's model. Define the
   `build` role in `~/.omp/agent/config.yml` — set to the main model here, so
   quality is unchanged, and switching that tier to a cheaper model later is
@@ -224,12 +238,14 @@ A name that did not load fails preflight with `Unknown agent "..."`.
   Several agents set `thinking-level: high`; models with no controllable
   effort ignore it.
 - Read-only agents declare only `read, grep, glob, web_search` (plus `bash` for
-  `security-reviewer`). They cannot edit even when asked to.
+  `security-reviewer` and `compliance-reviewer`). They cannot edit even when
+  asked to.
 - Only `chief-of-staff` declares `spawns`. The rest cannot start subagents.
 - No agent names a project. Project facts live in each project's `AGENTS.md`
   (this author's: `Storage-Scanner/`, `gmail-summarizer-extension/`,
   `roblox-game/`), which the agents read during **Orient first**.
-- `frontend`, `backend`, `debugger`, `test-engineer` and `ml-engineer` declare
+- `frontend`, `backend`, `debugger`, `test-engineer`, `ml-engineer`,
+  `data-engineer`, `sre` and `modernizer` declare
   `eval`: browser automation (`browser`) is a prelude inside `eval`, not a
   tool of its own.
 
